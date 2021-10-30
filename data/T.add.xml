@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2021-10-19 16:13:46 by Eclipse SUMO netedit Version 1.10.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="C:\Users\b2022\Documents\Sumo_shit\T\T.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\b2022\Documents\Sumo_shit\T\T.net.xml"/>
+    </output>
+
+    <processing>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+    </processing>
+
+    <junctions>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="5.5"/>
+        <rectangular-lane-cut value="false"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="false"/>
+    </pedestrian>
+
+    <netedit>
+        <additional-files value="C:\Users\b2022\Documents\Sumo_shit\T\T.xml"/>
+    </netedit>
+
+    <report>
+        <aggregate-warnings value="5"/>
+    </report>
+
+</configuration>
+-->
+
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <e1Detector id="e1Detector_gneE19_1_10" lane="gneE19_1" pos="39.28" freq="300.00" file="e1Detector_gneE19_1_10.xml"/>
+    <e1Detector id="e1Detector_gneE19_1_3" lane="gneE19_1" pos="0.54" freq="300.00" file="e1Detector_gneE19_1_3.xml"/>
+    <e1Detector id="e1Detector_gneE19_2_2" lane="gneE19_2" pos="0.54" freq="300.00" file="e1Detector_gneE19_2_2.xml"/>
+    <e1Detector id="e1Detector_gneE19_2_9" lane="gneE19_2" pos="39.54" freq="300.00" file="e1Detector_gneE19_2_9.xml"/>
+    <e1Detector id="e1Detector_gneE20_1_0" lane="gneE20_1" pos="1.26" freq="300.00" file="e1Detector_gneE20_1_0.xml"/>
+    <e1Detector id="e1Detector_gneE20_1_7" lane="gneE20_1" pos="40.66" freq="300.00" file="e1Detector_gneE20_1_7.xml"/>
+    <e1Detector id="e1Detector_gneE20_2_1" lane="gneE20_2" pos="1.26" freq="300.00" file="e1Detector_gneE20_2_1.xml"/>
+    <e1Detector id="e1Detector_gneE20_2_8" lane="gneE20_2" pos="40.53" freq="300.00" file="e1Detector_gneE20_2_8.xml"/>
+    <e1Detector id="e1Detector_gneE21_1_5" lane="gneE21_1" pos="29.96" freq="300.00" file="e1Detector_gneE21_1_5.xml"/>
+    <e1Detector id="e1Detector_gneE21_2_4" lane="gneE21_2" pos="2.61" freq="300.00" file="e1Detector_gneE21_2_4.xml"/>
+    <e1Detector id="e1Detector_gneE21_2_6" lane="gneE21_2" pos="30.23" freq="300.00" file="e1Detector_gneE21_2_6.xml"/>
+</additional>
