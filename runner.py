@@ -32,18 +32,16 @@ def run():
     hungerlevel = [0, 0]
     traci.trafficlight.setPhase("gneJ27", 0)
 
-    row = ["Time", "Phase 1 [0] Score", "Phase 4 [3] Score"]
+    row = ["Time", "Phase 1 [0] Score", "Phase 4 [1] Score", "Waiting Time", "Queue Lengths", "Number of Vehicles Exited the Intersection"]
     rows = []
+    vehicles = 0
+    waitingtime = 0
+    queuelength = 0
 
     while step <= T:
         traci.simulationStep()
         if step % min == 0:
             scores = algo(hungerlevel)
-            data = []
-            data.append(step)
-            data.append(scores[0])
-            data.append(scores[1])
-            rows.append(data)
             if traci.trafficlight.getPhase("gneJ27") == 0:
                 if scores[1] > scores[0]:
                     traci.trafficlight.setPhase("gneJ27", 1)
@@ -66,12 +64,18 @@ def run():
             elif traci.trafficlight.getPhase("gneJ27") == 4:
                 if scores[0] > scores[1]:
                     traci.trafficlight.setPhase("gneJ27", 5)
+        vehicles += traci.simulation.getArrivedNumber()
+        data = [step, algo(hungerlevel)[0], algo(hungerlevel)[1], traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2"), traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2"), vehicles]
+        waitingtime += data[3]
+        queuelength += data[4]
+        rows.append(data)
         step += 1
-    
-    filename = "results/data.csv"
+
+    f1 = "results/dataalgo.csv"
+    f2 = "results/dataalgocomp.csv"
   
     # writing to csv file
-    with open(filename, 'w') as csvfile:
+    with open(f1, 'w') as csvfile:
         # creating a csv writer object
         csvwriter = csv.writer(csvfile)
         
@@ -80,6 +84,15 @@ def run():
         
         # writing the data rows
         csvwriter.writerows(rows)
+    
+    with open(f2, 'w') as csvfile:
+        # creating a csv writer object
+        csvwriter = csv.writer(csvfile)
+        
+        # writing the fields
+        csvwriter.writerow(["Average Waiting Time: ", waitingtime / T])
+        csvwriter.writerow(["Average Queue Length: ", queuelength / T])
+        csvwriter.writerow(["Average Number of Vehicles Exited per Unit Time: ", vehicles / T])
     
     traci.close()
     sys.stdout.flush()
@@ -91,20 +104,26 @@ def runfixed():
     hungerlevel = [0, 0]
     traci.trafficlight.setPhase("gneJ27", 0)
 
-    row = ["Time", "Phase 1 [0] Score", "Phase 4 [3] Score", "Number of Vehicles Passed"]
+    row = ["Time", "Phase 1 [0] Score", "Phase 4 [1] Score", "Waiting Time", "Queue Lengths", "Number of Vehicles Exited the Intersection"]
     rows = []
+    vehicles = 0
+    waitingtime = 0
+    queuelength = 0
 
     while step <= T:
         traci.simulationStep()
-        data = [step, "-", "-",]
-        data.append(traci.simulation.getArrivedNumber())
+        vehicles += traci.simulation.getArrivedNumber()
+        data = [step, algo(hungerlevel)[0], algo(hungerlevel)[1], traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2"), traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2"), vehicles]
+        waitingtime += data[3]
+        queuelength += data[4]
         rows.append(data)
         step += 1
-    
-    filename = "results/datafixed.csv"
+
+    f1 = "results/datafixed.csv"
+    f2 = "results/datafixedcomp.csv"
   
     # writing to csv file
-    with open(filename, 'w') as csvfile:
+    with open(f1, 'w') as csvfile:
         # creating a csv writer object
         csvwriter = csv.writer(csvfile)
         
@@ -113,6 +132,15 @@ def runfixed():
         
         # writing the data rows
         csvwriter.writerows(rows)
+    
+    with open(f2, 'w') as csvfile:
+        # creating a csv writer object
+        csvwriter = csv.writer(csvfile)
+        
+        # writing the fields
+        csvwriter.writerow(["Average Waiting Time: ", waitingtime / T])
+        csvwriter.writerow(["Average Queue Length: ", queuelength / T])
+        csvwriter.writerow(["Average Number of Vehicles Exited per Unit Time: ", vehicles / T])
     
     traci.close()
     sys.stdout.flush()
@@ -133,10 +161,6 @@ def algo(hungerlevel):
 
     return scores
 
-
-def sortFunc(element):
-    return element[1]
-
 # this is the main entry point of this script
 if __name__ == "__main__":
     options = get_options()
@@ -156,11 +180,3 @@ if __name__ == "__main__":
     traci.start([sumoBinary, "-c", "data/T.sumocfg",
                              "--tripinfo-output", "tripinfo.xml"])
     run()
-
-
-
-
-
-
-
-
