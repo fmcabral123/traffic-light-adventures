@@ -23,141 +23,139 @@ def get_options():
     options, args = optParser.parse_args()
     return options
 
-import csv
+# everything above this is just for the purposes of setting up and for the sake of not breaking everything
 
-def run():
+import csv
+import pandas as pd
+import plotly.express as px
+
+def run(): # call this if we want to run the adaptive algo we made
     step = 0
     min = 37
     T = 3600
     hungerlevel = [0, 0]
-    traci.trafficlight.setPhase("gneJ27", 0)
+    traci.trafficlight.setPhase("gneJ27", 0) # phase indexes run from 0 to n - 1 if we have n phases, like a list
 
-    row = ["Time", "Phase 1 [0] Score", "Phase 4 [1] Score", "Waiting Time", "Queue Lengths", "Number of Vehicles Exited the Intersection"]
+    row = ["time", "waiting time", "queue length", "departure rate", "phase"]
     rows = []
-    vehicles = 0
-    waitingtime = 0
-    queuelength = 0
+    waitingtime, queuelength, exited = 0, 0, 0
 
-    while step <= T:
+    while step <= T: 
         traci.simulationStep()
-        if step % min == 0:
+        if step % min == 0: # runs iff step mod min equiv 0, so we don't go _too_ quick
             scores = algo(hungerlevel)
-            if traci.trafficlight.getPhase("gneJ27") == 0:
+            if traci.trafficlight.getPhase("gneJ27") == 0: # everything here is now just running through the phases. the "pivot" phases are 0 and 3. the "less important" phases after 0 are 1 and 2 (yellowlights), and likewise 4 and 5 for phase 3
                 if scores[1] > scores[0]:
                     traci.trafficlight.setPhase("gneJ27", 1)
+                    hungerlevel[1] = 0
+                else:
+                    traci.trafficlight.setPhase("gneJ27", 0)
+                    min = (traci.lane.getLastStepLength("gneE20_1") + traci.lane.getLastStepLength("gneE20_2") + traci.lane.getLastStepLength("gneE19_1") + traci.lane.getLastStepLength("gneE19_2")) / (4 * traci.lane.getMaxSpeed("gneE20_1"))
+                    hungerlevel[1] += 3
             elif traci.trafficlight.getPhase("gneJ27") == 3:
                 if scores[0] > scores[1]:
                     traci.trafficlight.setPhase("gneJ27", 4)
-            elif traci.trafficlight.getPhase("gneJ27") == 2:
-                if scores[1] > scores[0]:
-                    traci.trafficlight.setPhase("gneJ27", 3)
-                    hungerlevel[0] += 1
-                    hungerlevel[1] = 0
-            elif traci.trafficlight.getPhase("gneJ27") == 5:
-                if scores[0] > scores[1]:
-                    traci.trafficlight.setPhase("gneJ27", 1)
                     hungerlevel[0] = 0
-                    hungerlevel[1] += 1
-            elif traci.trafficlight.getPhase("gneJ27") == 1:
-                if scores[1] > scores[0]:
-                    traci.trafficlight.setPhase("gneJ27", 2)
-            elif traci.trafficlight.getPhase("gneJ27") == 4:
-                if scores[0] > scores[1]:
-                    traci.trafficlight.setPhase("gneJ27", 5)
-        vehicles += traci.simulation.getArrivedNumber()
-        data = [step, algo(hungerlevel)[0], algo(hungerlevel)[1], traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2"), traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2"), vehicles]
-        waitingtime += data[3]
-        queuelength += data[4]
+                else:
+                    traci.trafficlight.setPhase("gneJ27", 3)
+                    min = (traci.lane.getLastStepLength("gneE21_1") + traci.lane.getLastStepLength("gneE21_2")) / (2 * traci.lane.getMaxSpeed("gneE21_1"))
+                    hungerlevel[0] += 3    
+        waiting = traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2")
+        volume = traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2")    
+        exit = traci.simulation.getArrivedNumber()
+        data = [step, waiting / volume, volume / 6, exit, traci.trafficlight.getPhase("gneJ27")]
+        waitingtime += data[1]
+        queuelength += data[2]
+        exited += data[3]
         rows.append(data)
         step += 1
 
-    f1 = "results/dataalgo.csv"
-    f2 = "results/dataalgocomp.csv"
+    f1 = "results/dataalgo.csv" # for instantaneous values
+    f2 = "results/dataalgoave.csv" # for average values
   
     # writing to csv file
     with open(f1, 'w') as csvfile:
-        # creating a csv writer object
         csvwriter = csv.writer(csvfile)
         
-        # writing the fields
         csvwriter.writerow(row)
         
-        # writing the data rows
         csvwriter.writerows(rows)
+
+    df1 = pd.read_csv('results/dataalgo.csv')
+    df1.to_csv('results/dataalgo.csv', index=False)
     
     with open(f2, 'w') as csvfile:
-        # creating a csv writer object
         csvwriter = csv.writer(csvfile)
         
-        # writing the fields
-        csvwriter.writerow(["Average Waiting Time: ", waitingtime / T])
-        csvwriter.writerow(["Average Queue Length: ", queuelength / T])
-        csvwriter.writerow(["Average Number of Vehicles Exited per Unit Time: ", vehicles / T])
-    
+        csvwriter.writerow(["average waiting time", "average queue length", "average departure rate"])
+        csvwriter.writerow([waitingtime / T, queuelength / T, exited / T])
+
+    df2 = pd.read_csv('results/dataalgoave.csv')
+    df2.to_csv('results/dataalgoave.csv', index=False)
+
     traci.close()
     sys.stdout.flush()
 
-def runfixed():
+def runfixed(): # call for fixed-time. here, we only run this for the purposes of data collection (lmao). same datacollection process as before.
     step = 0
-    min = 37
     T = 3600
-    hungerlevel = [0, 0]
-    traci.trafficlight.setPhase("gneJ27", 0)
+    traci.trafficlight.setPhase("gneJ27", 0) # phase indexes run from 0 to n - 1 if we have n phases, like a list
 
-    row = ["Time", "Phase 1 [0] Score", "Phase 4 [1] Score", "Waiting Time", "Queue Lengths", "Number of Vehicles Exited the Intersection"]
+    row = ["time", "waiting time", "queue length", "departure rate", "phase"]
     rows = []
-    vehicles = 0
-    waitingtime = 0
-    queuelength = 0
+    waitingtime, queuelength, exited = 0, 0, 0
 
-    while step <= T:
+    while step <= T: 
         traci.simulationStep()
-        vehicles += traci.simulation.getArrivedNumber()
-        data = [step, algo(hungerlevel)[0], algo(hungerlevel)[1], traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2"), traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2"), vehicles]
-        waitingtime += data[3]
-        queuelength += data[4]
+        waiting = traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2")
+        volume = traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2")    
+        exit = traci.simulation.getArrivedNumber()
+        data = [step, waiting / volume, volume / 6, exit, traci.trafficlight.getPhase("gneJ27")]
+        waitingtime += data[1]
+        queuelength += data[2]
+        exited += data[3]
         rows.append(data)
         step += 1
 
-    f1 = "results/datafixed.csv"
-    f2 = "results/datafixedcomp.csv"
+    f1 = "results/datafixed.csv" # for instantaneous values
+    f2 = "results/datafixedave.csv" # for average values
   
     # writing to csv file
     with open(f1, 'w') as csvfile:
-        # creating a csv writer object
         csvwriter = csv.writer(csvfile)
         
-        # writing the fields
         csvwriter.writerow(row)
         
-        # writing the data rows
         csvwriter.writerows(rows)
+
+    df1 = pd.read_csv('results/datafixed.csv')
+    df1.to_csv('results/datafixed.csv', index=False)
     
     with open(f2, 'w') as csvfile:
-        # creating a csv writer object
         csvwriter = csv.writer(csvfile)
         
-        # writing the fields
-        csvwriter.writerow(["Average Waiting Time: ", waitingtime / T])
-        csvwriter.writerow(["Average Queue Length: ", queuelength / T])
-        csvwriter.writerow(["Average Number of Vehicles Exited per Unit Time: ", vehicles / T])
-    
+        csvwriter.writerow(["average waiting time", "average queue length", "average departure rate"])
+        csvwriter.writerow([waitingtime / T, queuelength / T, exited / T])
+
+    df2 = pd.read_csv('results/datafixedave.csv')
+    df2.to_csv('results/datafixedave.csv', index=False)
+
     traci.close()
-    sys.stdout.flush()
+    sys.stdout.flush()    
 
 def algo(hungerlevel):
-    A = 2
-    B = 2
+    A = 1
+    B = 1
     C = 1
     scores = [] 
 
     volume = traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2")
     waitingtime = traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2")
-    scores.append((A * volume + B * waitingtime + C * 4 * hungerlevel[0]) / 4)
+    scores.append(((A * volume / 4) + (B * waitingtime / volume) + (C * 4 * hungerlevel[0])) / 4)
 
     volume = traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2")
     waitingtime = traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2")
-    scores.append((A * volume + B * waitingtime + C * 2 * hungerlevel[1]) / 2)
+    scores.append(((A * volume / 2) + (B * waitingtime / volume) + (C * 2 * hungerlevel[1])) / 2)
 
     return scores
 
@@ -179,4 +177,4 @@ if __name__ == "__main__":
     # subprocess and then the python script connects and runs
     traci.start([sumoBinary, "-c", "data/T.sumocfg",
                              "--tripinfo-output", "tripinfo.xml"])
-    run()
+    runfixed()
