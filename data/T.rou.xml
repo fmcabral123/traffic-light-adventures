@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2021-10-19 16:13:53 by Eclipse SUMO netedit Version 1.10.0
+<!-- generated on 2021-11-01 15:42:49 by Eclipse SUMO netedit Version 1.10.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="C:\Users\b2022\Documents\Sumo_shit\T\T.net.xml"/>
+        <sumo-net-file value="C:\Users\Franco%20Cabral\OneDrive\Documents\Franco%20Cabral%20PSHS\Grade%2012\RES\Simulations\data\T.net.xml"/>
     </input>
 
     <output>
-        <output-file value="C:\Users\b2022\Documents\Sumo_shit\T\T.net.xml"/>
+        <output-file value="C:\Users\Franco%20Cabral\OneDrive\Documents\Franco%20Cabral%20PSHS\Grade%2012\RES\Simulations\data\T.net.xml"/>
     </output>
 
     <processing>
@@ -31,8 +31,7 @@
     </pedestrian>
 
     <netedit>
-        <additional-files value="C:\Users\b2022\Documents\Sumo_shit\T\T.xml"/>
-        <route-files value="C:\Users\b2022\Documents\Sumo_shit\T\T.rou.xml"/>
+        <route-files value="C:\Users\Franco%20Cabral\OneDrive\Documents\Franco%20Cabral%20PSHS\Grade%2012\RES\Simulations\data\T.rou.xml"/>
     </netedit>
 
     <report>
@@ -44,14 +43,14 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <flow id="flow_0" begin="0.00" from="gneE20" to="-gneE19" end="3600.00" number="1800"/>
-    <flow id="flow_1" begin="0.00" departLane="1" from="gneE20" to="-gneE21" end="3600.00" number="1800"/>
+    <flow id="flow_1" begin="0.00" from="gneE20" to="-gneE21" end="3600.00" number="1800"/>
     <flow id="flow_2" begin="0.00" from="gneE19" to="-gneE21" end="3600.00" number="1800"/>
     <flow id="flow_3" begin="0.00" from="gneE19" to="-gneE20" end="3600.00" number="1800"/>
-    <flow id="flow_4" begin="0.00" departLane="1" from="gneE19" to="-gneE20" end="3600.00" number="1800"/>
+    <flow id="flow_4" begin="0.00" from="gneE19" to="-gneE20" end="3600.00" number="1800"/>
     <flow id="flow_5" begin="0.00" from="gneE21" to="-gneE20" end="3600.00" number="1800"/>
-    <flow id="flow_6" begin="0.00" departLane="1" from="gneE21" to="-gneE19" end="3600.00" number="1800"/>
-    <flow id="flow_7" begin="0.00" departLane="1" from="gneE21" to="-gneE20" end="3600.00" number="1800"/>
-    <flow id="flow_8" begin="0.00" departLane="1" from="gneE20" to="-gneE19" end="3600.00" number="1800"/>
+    <flow id="flow_6" begin="0.00" from="gneE21" to="-gneE19" end="3600.00" number="1800"/>
+    <flow id="flow_7" begin="0.00" from="gneE21" to="-gneE20" end="3600.00" number="1800"/>
+    <flow id="flow_8" begin="0.00" from="gneE20" to="-gneE19" end="3600.00" number="1800"/>
     <personFlow id="personFlow_0" begin="0.00" end="3600.00" probability="0.01">
         <personTrip from="-gneE21" to="-gneE19"/>
     </personFlow>
