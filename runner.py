@@ -28,9 +28,9 @@ def get_options():
 import csv
 import pandas as pd
 
-def run(): # ignore this.
+def algo():
     step = 0
-    min = 47
+    min = 37
     T = 3600
     hungerlevel = [0, 0]
     traci.trafficlight.setPhase("gneJ27", 0)
@@ -50,6 +50,9 @@ def run(): # ignore this.
                     hungerlevel[1] = 0
                 else:
                     traci.trafficlight.setPhase("gneJ27", 0)
+                    duration = int((traci.lane.getLastStepVehicleNumber("gneE20_1")*traci.lane.getLastStepLength("gneE20_1")+traci.lane.getLastStepVehicleNumber("gneE20_2")*traci.lane.getLastStepLength("gneE20_2")+traci.lane.getLastStepVehicleNumber("gneE19_1")*traci.lane.getLastStepLength("gneE19_1")+traci.lane.getLastStepVehicleNumber("gneE19_2")*traci.lane.getLastStepLength("gneE19_2"))/(traci.lane.getLastStepMeanSpeed("gneE20_1") + traci.lane.getLastStepMeanSpeed("gneE20_2") + traci.lane.getLastStepMeanSpeed("gneE19_1") + traci.lane.getLastStepMeanSpeed("gneE19_2") + 0.01))
+                    print(step, duration)
+                    traci.trafficlight.setPhaseDuration("gneJ27", duration)
             elif traci.trafficlight.getPhase("gneJ27") == 3:
                 if scores[0] > scores[1]:
                     traci.trafficlight.setPhase("gneJ27", 4)
@@ -57,6 +60,9 @@ def run(): # ignore this.
                     hungerlevel[1] += 5
                 else:
                     traci.trafficlight.setPhase("gneJ27", 3)
+                    duration = int((traci.lane.getLastStepVehicleNumber("gneE21_1")*traci.lane.getLastStepLength("gneE21_1")+traci.lane.getLastStepVehicleNumber("gneE21_2")*traci.lane.getLastStepLength("gneE21_2"))/(traci.lane.getLastStepMeanSpeed("gneE21_1") + traci.lane.getLastStepMeanSpeed("gneE21_2") + 0.01))
+                    print(step, duration)
+                    traci.trafficlight.setPhaseDuration("gneJ27", duration)
         waiting = traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2")
         volume = traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2")    
         exit = traci.simulation.getArrivedNumber()
@@ -96,6 +102,7 @@ def run(): # ignore this.
     traci.close()
     sys.stdout.flush()
 
+'''
 def run2(): # THIS IS THE REVISED ALGORITHM, WORK HERE! also don't forget to do run2() at the bottom
     step = 0
     min = 0
@@ -113,9 +120,9 @@ def run2(): # THIS IS THE REVISED ALGORITHM, WORK HERE! also don't forget to do 
         traci.simulationStep()
         if traci.trafficlight.getPhase("gneJ27") == 0:
             if traci.trafficlight.getPhase("gneJ27") != phase:
-                length = 1
-                velocity = 1
-                min = length / velocity # TASK 1: compute average length of vehicle queues (in m) per lane, and average velocity of vehicles (m/s) per lane. i believe there is something sa lane value retrieval that allows us to do this
+                min = int((traci.lane.getLastStepVehicleNumber("gneE20_1")*traci.lane.getLastStepLength("gneE20_1")+traci.lane.getLastStepVehicleNumber("gneE20_2")*traci.lane.getLastStepLength("gneE20_2")+traci.lane.getLastStepVehicleNumber("gneE19_1")*traci.lane.getLastStepLength("gneE19_1")+traci.lane.getLastStepVehicleNumber("gneE19_2")*traci.lane.getLastStepLength("gneE19_2"))/(traci.lane.getLastStepMeanSpeed("gneE20_1") + traci.lane.getLastStepMeanSpeed("gneE20_2") + traci.lane.getLastStepMeanSpeed("gneE19_1") + traci.lane.getLastStepMeanSpeed("gneE19_2") + 0.01))
+                if min > 50:
+                    min = 50
                 traci.trafficlight.setPhase("gneJ27", 0)
                 ticker += 1
             else:
@@ -125,22 +132,22 @@ def run2(): # THIS IS THE REVISED ALGORITHM, WORK HERE! also don't forget to do 
                 else:
                     scores = algo(hungerlevel)
                     ticker = 0
-                    if scores[1] > scores [0]:
+                    if scores[1] > scores[0]:
                         traci.trafficlight.setPhase("gneJ27", 1)
                         hungerlevel[0] += 5
                         hungerlevel[1] = 0
                     else:
-                        length = 1
-                        velocity = 1
-                        min = length / velocity # TASK 2: copy paste code in TASK 1 HAHAHA
+                        min = int((traci.lane.getLastStepVehicleNumber("gneE20_1")*traci.lane.getLastStepLength("gneE20_1")+traci.lane.getLastStepVehicleNumber("gneE20_2")*traci.lane.getLastStepLength("gneE20_2")+traci.lane.getLastStepVehicleNumber("gneE19_1")*traci.lane.getLastStepLength("gneE19_1")+traci.lane.getLastStepVehicleNumber("gneE19_2")*traci.lane.getLastStepLength("gneE19_2"))/(traci.lane.getLastStepMeanSpeed("gneE20_1") + traci.lane.getLastStepMeanSpeed("gneE20_2") + traci.lane.getLastStepMeanSpeed("gneE19_1") + traci.lane.getLastStepMeanSpeed("gneE19_2") + 0.01))
+                        if min > 50:
+                            min = 50
                         traci.trafficlight.setPhase("gneJ27", 0)
                         ticker += 1
 
         elif traci.trafficlight.getPhase("gneJ27") == 3:
             if traci.trafficlight.getPhase("gneJ27") != phase:
-                length = 1
-                velocity = 1
-                min = length / velocity # TASK 3: do the same thing in TASK 1, but now for the lanes in phase 3. note that task 1 is for lanes in phase 0.
+                min = int((traci.lane.getLastStepVehicleNumber("gneE21_1")*traci.lane.getLastStepLength("gneE21_1")+traci.lane.getLastStepVehicleNumber("gneE21_2")*traci.lane.getLastStepLength("gneE21_2"))/(traci.lane.getLastStepMeanSpeed("gneE21_1") + traci.lane.getLastStepMeanSpeed("gneE21_2") + 0.01))
+                if min > 50:
+                    min = 50
                 traci.trafficlight.setPhase("gneJ27", 3)
                 ticker += 1
             else:
@@ -150,18 +157,17 @@ def run2(): # THIS IS THE REVISED ALGORITHM, WORK HERE! also don't forget to do 
                 else:
                     scores = algo(hungerlevel)
                     ticker = 0
-                    if scores[0] > scores [1]:
+                    if scores[0] > scores[1]:
                         traci.trafficlight.setPhase("gneJ27", 4)
                         hungerlevel[0] = 0
                         hungerlevel[1] += 5
                     else:
-                        length = 1
-                        velocity = 1
-                        min = length / velocity # TASK 4: copy paste code in TASK 3
+                        min = int((traci.lane.getLastStepVehicleNumber("gneE21_1")*traci.lane.getLastStepLength("gneE21_1")+traci.lane.getLastStepVehicleNumber("gneE21_2")*traci.lane.getLastStepLength("gneE21_2"))/(traci.lane.getLastStepMeanSpeed("gneE21_1") + traci.lane.getLastStepMeanSpeed("gneE21_2")  + 0.01))
+                        if min > 50:
+                            min = 50
                         traci.trafficlight.setPhase("gneJ27", 3)
                         ticker += 1
 
-        
         phase = traci.trafficlight.getPhase("gneJ27")
         waiting = traci.lane.getWaitingTime("gneE20_1") + traci.lane.getWaitingTime("gneE20_2") + traci.lane.getWaitingTime("gneE19_1") + traci.lane.getWaitingTime("gneE19_2") + traci.lane.getWaitingTime("gneE21_1") + traci.lane.getWaitingTime("gneE21_2")
         volume = traci.lane.getLastStepVehicleNumber("gneE20_1") + traci.lane.getLastStepVehicleNumber("gneE20_2") + traci.lane.getLastStepVehicleNumber("gneE19_1") + traci.lane.getLastStepVehicleNumber("gneE19_2") + traci.lane.getLastStepVehicleNumber("gneE21_1") + traci.lane.getLastStepVehicleNumber("gneE21_2")    
@@ -201,8 +207,9 @@ def run2(): # THIS IS THE REVISED ALGORITHM, WORK HERE! also don't forget to do 
 
     traci.close()
     sys.stdout.flush()
+'''
 
-def runfixed(): # call for fixed-time. here, we only run this for the purposes of data collection (lmao). same datacollection process as before.
+def fixed(): # call for fixed-time. here, we only run this for the purposes of data collection (lmao). same datacollection process as before.
     step = 0
     T = 3600
     traci.trafficlight.setPhase("gneJ27", 0) # phase indexes run from 0 to n - 1 if we have n phases, like a list
@@ -283,4 +290,4 @@ if __name__ == "__main__":
     # subprocess and then the python script connects and runs
     traci.start([sumoBinary, "-c", "data/T.sumocfg",
                              "--tripinfo-output", "tripinfo.xml"])
-    run2()
+    fixed()
