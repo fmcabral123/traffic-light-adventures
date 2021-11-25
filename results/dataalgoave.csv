@@ -1,2 +1,2 @@
-average waiting time,average queue length,average departure rate
+average waiting time (s/vehicle),average queue length (vehicle/lane),average departure rate (vehicle/s)
 16.549500629367397,7.836296296296285,0.7058333333333333
