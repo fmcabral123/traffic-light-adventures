@@ -28,9 +28,9 @@ def get_options():
 import csv
 import pandas as pd
 
-def algo():
+def algorithm():
     step = 0
-    min = 37
+    min = 47
     T = 3600
     hungerlevel = [0, 0]
     traci.trafficlight.setPhase("gneJ27", 0)
@@ -290,4 +290,4 @@ if __name__ == "__main__":
     # subprocess and then the python script connects and runs
     traci.start([sumoBinary, "-c", "data/T.sumocfg",
                              "--tripinfo-output", "tripinfo.xml"])
-    fixed()
+    algorithm()
