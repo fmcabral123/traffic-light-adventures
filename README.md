@@ -6,7 +6,7 @@ _(Last updated on November 25, 2021)_
 ## Algorithm logic
 
 ```
-for every 37 seconds:
+for every 47 seconds:
     if phase == 0:
         if phase 3 score > phase 0 score:
             go to phase 3
