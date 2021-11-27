@@ -32,7 +32,7 @@ The green light duration t for a phase is determined by the equation t = l/v, wh
 
 ## Simulation
 
-Here is a picture of the simulation running with the adaptive algorithm (or is it?)! Pretty cool. The simulation was designed to run up to a time T = 3600 s.
+Here is a picture of the simulation running with the adaptive algorithm (or is it?). Pretty cool. The simulation was designed to run up to a time T = 3600 s.
 
 ![image](https://user-images.githubusercontent.com/75599698/143374379-6b4b1fed-1b98-47b2-ade7-2b9722e0d77a.png)
 
