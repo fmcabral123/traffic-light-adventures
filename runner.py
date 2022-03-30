@@ -212,7 +212,7 @@ def run2(): # THIS IS THE REVISED ALGORITHM, WORK HERE! also don't forget to do 
 def fixed(): # call for fixed-time. here, we only run this for the purposes of data collection (lmao). same datacollection process as before.
     step = 0
     T = 3600
-    traci.trafficlight.setPhase("gneJ27", 0) # phase indexes run from 0 to n - 1 if we have n phases, like a list
+    traci.trafficlight.setPhase("gneJ27", 0)
 
     row = ["time", "waiting time", "queue length", "departure rate", "phase"]
     rows = []
@@ -228,8 +228,8 @@ def fixed(): # call for fixed-time. here, we only run this for the purposes of d
         queuelength += data[2]
         exited += data[3]
         rows.append(data)
-        step += 1
-
+        step += 1    
+        
     f1 = "results/datafixed.csv" # for instantaneous values
     f2 = "results/datafixedave.csv" # for average values
   
